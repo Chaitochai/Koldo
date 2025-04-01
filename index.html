@@ -410,20 +410,6 @@
 
         function handleTouchMove(e) {
             e.preventDefault();
-            const touchX = e.touches[0].clientX;
-            const touchY = e.touches[0].clientY;
-            const deltaX = touchX - touchStartX;
-            const deltaY = touchY - touchStartY;
-            
-            const piece = e.target;
-            const currentLeft = parseFloat(piece.style.left);
-            const currentTop = parseFloat(piece.style.top);
-            
-            piece.style.left = `${currentLeft + deltaX}px`;
-            piece.style.top = `${currentTop + deltaY}px`;
-            
-            touchStartX = touchX;
-            touchStartY = touchY;
         }
 
         function handleTouchEnd(e) {
@@ -436,12 +422,23 @@
             const targetRow = Math.round(currentTop / pieceSize.height);
             
             if (targetCol >= 0 && targetCol < cols && targetRow >= 0 && targetRow < rows) {
-                piece.dataset.col = targetCol;
-                piece.dataset.row = targetRow;
-                updatePiecePosition(piece);
-                
-                if (checkWin()) {
-                    completePuzzle();
+                const row = parseInt(piece.dataset.row);
+                const col = parseInt(piece.dataset.col);
+
+                if ((Math.abs(row - emptyPiece.row) === 1 && col === emptyPiece.col) ||
+                    (Math.abs(col - emptyPiece.col) === 1 && row === emptyPiece.row)) {
+                    const tempRow = emptyPiece.row;
+                    const tempCol = emptyPiece.col;
+                    emptyPiece = { row, col };
+                    piece.dataset.row = tempRow;
+                    piece.dataset.col = tempCol;
+                    updatePiecePosition(piece);
+
+                    if (checkWin()) {
+                        completePuzzle();
+                    }
+                } else {
+                    updatePiecePosition(piece);
                 }
             } else {
                 updatePiecePosition(piece);
